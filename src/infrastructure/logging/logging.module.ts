@@ -4,7 +4,7 @@ import { LoggingInterceptor } from './logging.interceptor';
 import { WinstonLoggerService } from '../services/winston.service.impl';
 import { PerformanceInterceptor } from '../performance/performance.interceptor';
 import loggingConfig from './logging.config';
-import { ILoggerService } from '@/domain/abstractions/logging/logger.service';
+import { ILoggerService } from '@/domain/abstractions/logging/logger.interface';
 
 @Global()
 @Module({

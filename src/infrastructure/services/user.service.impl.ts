@@ -1,6 +1,6 @@
 import { User } from '@/domain/models/user.model';
 import { UserRepository } from '@/domain/repositories/user.repository';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.service';
+import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
 import { UserService } from '@/domain/services/user.service';
 import { Injectable, Logger } from '@nestjs/common';
 

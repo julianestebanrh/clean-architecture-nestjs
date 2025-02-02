@@ -9,7 +9,7 @@ import { UserRepositoryImpl } from '@/infrastructure/persistence/repositories/us
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@/infrastructure/persistence/entities/user.entity';
 import { UserRepository } from '@/domain/repositories/user.repository';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.service';
+import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
 import { JwtStrategy } from '@/infrastructure/auth/jwt.strategy';
 import { AuthServiceImpl } from '@/infrastructure/services/auth.service.impl';
 import { IdGeneratorServiceImpl } from '@/infrastructure/services/id-generator.service.impl';

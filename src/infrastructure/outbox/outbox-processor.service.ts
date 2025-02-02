@@ -9,7 +9,7 @@ import { IOutboxService } from "@/domain/abstractions/outbox/outbox.interface";
 import { AggregateRoot } from "@/domain/abstractions/domain-event/aggregate-root";
 import { EventMetadata } from "@/domain/abstractions/domain-event/event-metadata.interface";
 import { ICorrelationContext } from "@/domain/abstractions/correlation/correlation-context.interface";
-import { IdGeneratorService } from "@/domain/abstractions/generate-id/id-generator.service";
+import { IdGeneratorService } from "@/domain/abstractions/generate-id/id-generator.interface";
 
 @Injectable()
 export class OutboxService implements IOutboxService  {

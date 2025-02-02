@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { DomainEventsSubscriber } from '../middleware/domain-events.subscriber';
 import { OutboxModule } from '@/infrastructure/outbox/outbox.module';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.service';
+import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
 import { IdGeneratorServiceImpl } from '@/infrastructure/services/id-generator.service.impl';
 import { IOutboxService } from '@/domain/abstractions/outbox/outbox.interface';
 import { OutboxService } from '@/infrastructure/outbox/outbox-processor.service';

@@ -9,7 +9,7 @@ import { GetUserHandler } from '@/application/features/users/get-user/get-user.h
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@/infrastructure/persistence/entities/user.entity';
 import { UserRepository } from '@/domain/repositories/user.repository';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.service';
+import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
 import { ListUsersHandler } from '@/application/features/users/list-user/list-user.handler';
 import { RedisCacheModule } from '@/infrastructure/cache/cache.module';
 import { UpdateUserHandler } from '@/application/features/users/update-user/update-user.handler';

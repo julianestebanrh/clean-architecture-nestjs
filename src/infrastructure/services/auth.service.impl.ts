@@ -1,7 +1,7 @@
 import { User } from '@/domain/models/user.model';
 import { UserRepository } from '@/domain/repositories/user.repository';
 import { AuthService } from '@/domain/services/auth.service';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.service';
+import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
