@@ -1,0 +1,68 @@
+services:
+  # Servicio de la aplicación Nest.js
+  app:
+    build:
+      context: .  # Usa el Dockerfile en el directorio actual
+      dockerfile: dockerfile
+    container_name: nest-app
+    ports:
+      - "3000:3000"  # Expone el puerto 3000 de la aplicación
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db  # Nombre del servicio de la base de datos
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=clean_architecture
+    depends_on:
+      - db  # La aplicación depende de la base de datos
+    networks:
+      - nest-network
+
+  # Servicio de la base de datos PostgreSQL
+  db:
+    image: postgres:16  # Usamos una imagen ligera de PostgreSQL
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=clean_architecture
+    volumes:
+      - ./.postgresql:/var/lib/postgresql/data  # Persistencia de datos
+    ports:
+      - "6432:5432"  # Expone el puerto 5432 de PostgreSQL
+    networks:
+      - nest-network
+
+    
+  redis:
+    image: redis:6
+    container_name: redis-db
+    volumes:
+      - ./.redis:/data
+    command: ["redis-server", "--requirepass", "redis_password"]
+    ports:
+      - "6379:6379"
+    networks:
+      - nest-network
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_API_CANONICALURI=http://seq:5341
+      - SEQ_FIRSTRUN_ADMINUSERNAME=seq_user #Seq@Winston
+      - SEQ_FIRSTRUN_ADMINPASSWORD=QP+fGUw0N7oW0uXibua4N/cM+L4Xq5pb1srvqvfgC39ExUg2yKHYT0LPNwJl4wplF/CJ2oWWFL2tsp1rHN19tR5KIOOSj2bw9ddR8mweqAxS
+    volumes:
+      - ./.seq:/data
+    ports:
+      - "6341:80"
+      - "5341:5341"
+    networks:
+      - nest-network
+
+# Red para conectar los servicios
+networks:
+  nest-network:
+    driver: bridge
