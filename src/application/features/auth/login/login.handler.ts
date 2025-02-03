@@ -1,7 +1,7 @@
 import { CommandHandler as NestCommandHandler } from '@nestjs/cqrs';
 import { AuthService } from '@/domain/services/auth.service';
 import { LoginCommand } from './login.command';
-import { CommandHandler } from '@/application/abstractions/messaging/command';
+import { CommandHandler } from '@/domain/abstractions/messaging/command';
 import { Result } from '@/domain/abstractions/result';
 import { UserError } from '@/domain/errors/user.errors';
 

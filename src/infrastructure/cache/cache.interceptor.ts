@@ -7,14 +7,14 @@ import {
 } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { CacheService } from './cache.service';
+import { ICacheService } from '@/domain/abstractions/cache/cache.interface';
 
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
 
   private readonly logger = new Logger(CacheInterceptor.name)
 
-  constructor(private readonly cacheService: CacheService) {
+  constructor(private readonly cacheService: ICacheService) {
 
   }
 

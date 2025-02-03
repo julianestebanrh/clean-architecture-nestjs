@@ -13,13 +13,13 @@ export class UserRepositoryImpl implements UserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async create(user: User): Promise<User | null> {
     const userEntity = UserEntity.create(user);
     const savedEntity = await this.userRepository.save(userEntity);
-     // Retornar el modelo de dominio
-     return savedEntity.toDomain();
+    // Retornar el modelo de dominio
+    return savedEntity.toDomain();
   }
 
   async findById(id: string): Promise<User | null> {
@@ -49,13 +49,18 @@ export class UserRepositoryImpl implements UserRepository {
 
   async update(id: string, user: User): Promise<User | null> {
 
-     let userToUpdate = await this.findById(id);
-     if (!userToUpdate) {
-       throw new Error('User not found');
-     }
-
-     const updatedUser = UserEntity.update(id, user.name, user.email, user.password);
-     await this.userRepository.update(id, updatedUser);
-     return updatedUser.toDomain();
+    let userToUpdate = await this.findById(id);
+    if (!userToUpdate) {
+      return null;
     }
+
+    const updatedUser = UserEntity.update(user);
+    this.logger.debug(`Updating user with id: ${id}, result: ${JSON.stringify(updatedUser)}`);
+
+    const result = await this.userRepository.update(id, updatedUser);
+
+    this.logger.debug(`Row affected: ${result.affected}`);
+
+    return updatedUser.toDomain();
+  }
 }

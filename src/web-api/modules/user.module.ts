@@ -50,7 +50,7 @@ const services = [
         TypeOrmModule.forFeature([UserEntity]), 
         CqrsPatternModule, 
         DatabaseModule, 
-        RedisCacheModule
+        // RedisCacheModule
     ],
     controllers: [UserController],
     providers: [

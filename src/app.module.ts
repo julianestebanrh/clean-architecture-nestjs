@@ -13,6 +13,7 @@ import loggingConfig from './infrastructure/logging/logging.config';
 import { CorrelationMiddleware } from './infrastructure/correlation/correlation-id.middleware';
 import { OutboxModule } from './infrastructure/outbox/outbox.module';
 import { CorrelationModule } from './infrastructure/correlation/correlation.module';
+import { RedisCacheModule } from './infrastructure/cache/cache.module';
 
 
 @Module({
@@ -29,6 +30,7 @@ import { CorrelationModule } from './infrastructure/correlation/correlation.modu
     DatabaseModule,
     CqrsPatternModule,
     CorrelationModule,
+    RedisCacheModule,
     AuthModule,
     UserModule,
   ],

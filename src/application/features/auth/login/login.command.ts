@@ -1,4 +1,4 @@
-import { ICommand } from "@/application/abstractions/messaging/command";
+import { ICommand } from "@/domain/abstractions/messaging/command";
 
 
 export class LoginCommand implements ICommand<string> {

@@ -21,7 +21,8 @@ export class UserServiceImpl implements UserService {
   }
 
   async getUserById(id: string): Promise<User | null> {
-    return this.userRepository.findById(id);
+    const user = await this.userRepository.findById(id);
+    return user;
   }
 
   async listUsers(): Promise<User[] | null> {

@@ -1,11 +1,11 @@
 import { CommandHandler as NestCommandHandler } from '@nestjs/cqrs';
-import { UpdateUserCommand } from './update-user.command';
 import { User } from '@/domain/models/user.model';
-import { UserService } from '@/domain/services/user.service';
-import { CommandHandler } from '@/application/abstractions/messaging/command';
 import { Result } from '@/domain/abstractions/result';
 import { UserError } from '@/domain/errors/user.errors';
+import { UserService } from '@/domain/services/user.service';
+import { CommandHandler } from '@/domain/abstractions/messaging/command';
 import { UserDto } from '@/application/dtos/users/user.dto';
+import { UpdateUserCommand } from './update-user.command';
 
 @NestCommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements CommandHandler<UpdateUserCommand, UserDto> {

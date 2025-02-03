@@ -2,7 +2,7 @@ import { QueryHandler as NestQueryHandler } from '@nestjs/cqrs';
 import { UserService } from '@/domain/services/user.service';
 import { GetUserQuery } from './get-user.query';
 import { UserDto } from '@/application/dtos/users/user.dto';
-import { QueryHandler } from '@/application/abstractions/messaging/query';
+import { QueryHandler } from '@/domain/abstractions/messaging/query';
 import { Result } from '@/domain/abstractions/result';
 import { UserError } from '@/domain/errors/user.errors';
 
@@ -18,7 +18,7 @@ export class GetUserHandler implements QueryHandler<GetUserQuery, UserDto | null
         if (!user) {
             return Result.failure(UserError.NotFound);
         }
-        return Result.success(new UserDto(user.id, user.name, user.email));
+        return Result.success(user);
     }
 
   

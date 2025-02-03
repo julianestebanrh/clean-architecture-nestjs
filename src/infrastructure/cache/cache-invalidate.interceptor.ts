@@ -7,18 +7,22 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { CacheService } from './cache.service';
+import { ICacheService } from '@/domain/abstractions/cache/cache.interface';
 
 @Injectable()
 export class CacheInvalidatorInterceptor implements NestInterceptor {
 
   private readonly logger = new Logger(CacheInvalidatorInterceptor.name); 
 
-  constructor(private readonly cacheService: CacheService) {}
+  constructor(private readonly cacheService: ICacheService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+
+
     const request = context.switchToHttp().getRequest();
-    const cacheKey = this.getCacheKey(request);
+    const { method, url, params } = request;
+
+    const cacheKey = this.getCacheKey(method, url, params);
 
     this.logger.log(`Invalidating cache for key: ${cacheKey}`);
 
@@ -28,20 +32,18 @@ export class CacheInvalidatorInterceptor implements NestInterceptor {
       tap(() => {
         if (cacheKey) {
           this.cacheService.del(cacheKey); // Invalida la clave específica
-          this.cacheService.del(`${this.getResourceFromUrl(request.url)}:list`); // Invalida la lista completa
+          this.cacheService.del(`${this.getResourceFromUrl(url)}:list`); // Invalida la lista completa
         }
       }),
     );
   }
 
-  private getCacheKey(request: any): string {
-    const { method, url, params } = request;
+  private getCacheKey(method: any, url: any, params: any): string {
 
     // Ejemplo de claves:
     // POST /users -> user:list (invalida la lista de usuarios)
     // PUT /users/:id -> user:<uuid> (invalida el usuario específico)
     // DELETE /users/:id -> user:<uuid> (invalida el usuario específico)
-
     if (['POST', 'PUT', 'DELETE'].includes(method)) {
       const resource = this.getResourceFromUrl(url); // Obtiene el recurso (users, products, etc.)
       const id = params.id; // Obtiene el ID si existe
@@ -52,7 +54,6 @@ export class CacheInvalidatorInterceptor implements NestInterceptor {
         return `${resource}:list`; // Ejemplo: user:list
       }
     }
-
     // Si no es una operación de escritura, no se invalida la caché
     return null;
   }
@@ -63,3 +64,5 @@ export class CacheInvalidatorInterceptor implements NestInterceptor {
     return parts[1]; // Asume que el recurso es la segunda parte de la URL
   }
 }
+
+
