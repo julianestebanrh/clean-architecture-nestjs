@@ -1,4 +1,4 @@
-import { EventMetadata } from "@/domain/abstractions/domain-event/event-metadata.interface";
+import { EventMetadata } from "@domain/abstractions/domain-event/event-metadata.interface";
 import { Column, CreateDateColumn, Entity, PrimaryColumn, VersionColumn } from "typeorm";
 
 @Entity('outbox_messages')

@@ -3,6 +3,7 @@ import { DomainEvent } from "../../../abstractions/domain-event/domain-event.bas
 export class UserCreatedDomainEvent extends DomainEvent {
     constructor(
       public readonly userId: string,
+      public readonly email: string,
     ) {
       super();
     }

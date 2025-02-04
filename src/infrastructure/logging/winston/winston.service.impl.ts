@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'winston';
-import { ConfigService } from '@nestjs/config';
 import { AsyncLocalStorage } from 'async_hooks';
-import { ILoggerService } from '@/domain/abstractions/logging/logger.interface';
-import { configureWinston } from '../logging/winston.config';
+import { ConfigService } from '@nestjs/config';
+import { ILoggerService } from '@domain/abstractions/logging/logger.interface';
+import { configureWinston } from './winston.config';
 
 @Injectable()
 export class WinstonLoggerService implements ILoggerService {

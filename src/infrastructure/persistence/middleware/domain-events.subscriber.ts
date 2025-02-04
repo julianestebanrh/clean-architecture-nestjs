@@ -1,18 +1,18 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent, RemoveEvent, Repository } from 'typeorm';
 import { Injectable, Logger } from '@nestjs/common';
-import { AggregateRoot } from '@/domain/abstractions/domain-event/aggregate-root';
-import { IOutboxService } from '@/domain/abstractions/outbox/outbox.interface';
+import { EntityBase } from '@domain/abstractions/domain-event/entity-base';
+import { OutboxService } from '@application/abstractions/outbox/outbox.interface';
+
 
 
 @Injectable()
 @EventSubscriber()
 export class DomainEventsSubscriber implements EntitySubscriberInterface {
   private readonly logger = new Logger(DomainEventsSubscriber.name);
-  private isProcessing = false;
 
   constructor(
     private readonly dataSource: DataSource,
-    private readonly outboxService: IOutboxService
+    private readonly outboxService: OutboxService
 
   ) {
     dataSource.subscribers.push(this);
@@ -20,28 +20,33 @@ export class DomainEventsSubscriber implements EntitySubscriberInterface {
   }
 
   listenTo() {
-    this.logger.log('Listening to AggregateRoot');
-    return AggregateRoot;
+    this.logger.log('Listening to EntityBase');
+    return EntityBase;
   }
 
   async afterInsert(event: InsertEvent<any>): Promise<void> {
-    if (event.entity instanceof AggregateRoot) {
-      await this.outboxService.saveEvents(event.entity);
+    const entity = event.entity;
+    if (event.entity instanceof EntityBase) {
+      this.logger.log(`After insert: ${JSON.stringify(entity)}`);
+      await this.outboxService.saveEvents(entity);
     }
   }
 
   async afterUpdate(event: UpdateEvent<any>): Promise<void> {
-    if (event.entity instanceof AggregateRoot) {
-      await this.outboxService.saveEvents(event.entity);
+    const entity = event.entity as EntityBase;
+    if (event.entity instanceof EntityBase) {
+      this.logger.log(`After update: ${JSON.stringify(entity)}`);
+      await this.outboxService.saveEvents(entity);
     }
   }
 
   async afterRemove(event: RemoveEvent<any>): Promise<void> {
-    if (event.entity instanceof AggregateRoot) {
-      await this.outboxService.saveEvents(event.entity);
+    const entity = event.entity;
+    if (event.entity instanceof EntityBase) {
+      this.logger.log(`After remove: ${JSON.stringify(entity)}`);
+      await this.outboxService.saveEvents(entity);
     }
   }
-
 
 
 

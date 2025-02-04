@@ -1,5 +1,5 @@
-import { ICorrelationContext } from '@/domain/abstractions/correlation/correlation-context.interface';
-import { ICorrelationStore } from '@/domain/abstractions/correlation/correlation-store.interface';
+import { ICorrelationContext } from '@application/abstractions/correlation/correlation-context.interface';
+import { ICorrelationStore } from '@application/abstractions/correlation/correlation-store.interface';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

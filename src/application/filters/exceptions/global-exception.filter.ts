@@ -1,7 +1,7 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
-import { AppError } from '@/domain/abstractions/error';
-import { ILoggerService } from '@/domain/abstractions/logging/logger.interface';
+import { AppError } from '@domain/abstractions/error';
+import { ILoggerService } from '@domain/abstractions/logging/logger.interface';
 
 interface ProblemDetail {
   // type: string;

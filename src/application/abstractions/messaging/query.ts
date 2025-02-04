@@ -1,4 +1,4 @@
-// import { Result } from "@/domain/abstractions/result";
+// import { Result } from "@domain/abstractions/result";
 // import { Query, IQuery as IQueryNest} from "@nestjs/cqrs";
 
 // export interface IQuery<TResponse>  { 

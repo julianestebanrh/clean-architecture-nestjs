@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { UserRegisteredDomainEvent } from "@/domain/models/domain-events/user/user-registered.domain.event";
+import { UserRegisteredDomainEvent } from "@domain/models/domain-events/user/user-registered.domain.event";
 
 @Injectable()
 export class UserRegisteredEventHandler {

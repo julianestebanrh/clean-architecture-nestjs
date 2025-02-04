@@ -1,4 +1,4 @@
-// import { Result } from "@/domain/abstractions/result";
+// import { Result } from "@domain/abstractions/result";
 // import { ICommand as ICommandNest } from "@nestjs/cqrs";
 
 // export interface ICommand<TResponse>{}

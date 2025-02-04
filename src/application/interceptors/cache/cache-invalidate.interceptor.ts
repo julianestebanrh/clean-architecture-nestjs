@@ -7,14 +7,14 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { ICacheService } from '@/domain/abstractions/cache/cache.interface';
+import { CacheService } from '@application/abstractions/cache/cache.interface';
 
 @Injectable()
 export class CacheInvalidatorInterceptor implements NestInterceptor {
 
   private readonly logger = new Logger(CacheInvalidatorInterceptor.name); 
 
-  constructor(private readonly cacheService: ICacheService) {}
+  constructor(private readonly cacheService: CacheService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
 
@@ -23,9 +23,6 @@ export class CacheInvalidatorInterceptor implements NestInterceptor {
     const { method, url, params } = request;
 
     const cacheKey = this.getCacheKey(method, url, params);
-
-    this.logger.log(`Invalidating cache for key: ${cacheKey}`);
-
 
     // Invalida la caché antes de ejecutar el handler
     return next.handle().pipe(

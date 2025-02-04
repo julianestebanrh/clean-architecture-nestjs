@@ -1,7 +1,7 @@
 import { CommandHandler as NestCommandHandler } from '@nestjs/cqrs';
-import { CommandHandler } from '@/domain/abstractions/messaging/command';
-import { Result } from '@/domain/abstractions/result';
-import { UserService } from '@/domain/services/user.service';
+import { CommandHandler } from '@domain/abstractions/messaging/command';
+import { Result } from '@domain/abstractions/result';
+import { UserService } from '@application/abstractions/services/user.service';
 import { CreateUserCommand } from './create-user.command';
 
 @NestCommandHandler(CreateUserCommand)

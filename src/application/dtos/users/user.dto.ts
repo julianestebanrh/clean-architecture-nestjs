@@ -1,3 +1,4 @@
+import { UserModel } from "@domain/models/user.model";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsUUID } from "class-validator";
 
@@ -19,6 +20,10 @@ export class UserDto {
         this.id = id;
         this.name = name;
         this.email = email;
+    }
+
+    static fromDomain(user: UserModel): UserDto {
+        return new UserDto(user.id, user.name, user.email);
     }
 
 }   

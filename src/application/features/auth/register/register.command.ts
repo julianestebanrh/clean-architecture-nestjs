@@ -1,4 +1,4 @@
-import { ICommand } from "@/domain/abstractions/messaging/command";
+import { ICommand } from "@domain/abstractions/messaging/command";
 
 export class RegisterCommand implements ICommand<string>  {
   constructor(

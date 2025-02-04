@@ -1,4 +1,4 @@
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
+import { IdGeneratorService } from '@application/abstractions/generate-id/id-generator.interface';
 import { Global, Injectable } from '@nestjs/common';
 // import { v4 as uuidv4 } from 'uuid'; 
 import { v7 as uuidv7 } from 'uuid'; 

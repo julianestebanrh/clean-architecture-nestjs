@@ -1,9 +1,9 @@
-import { User } from '../models/user.model';
+import { UserModel } from '../models/user.model';
 
 export abstract class UserRepository {
-  abstract create(user: User): Promise<User | null>;
-  abstract findById(id: string): Promise<User | null>;
-  abstract findByEmail(email: string): Promise<User | null>;
-  abstract listUsers(): Promise<User[] | null>;
-  abstract update(id: string, user: User): Promise<User | null>;
+  abstract create(user: UserModel): Promise<void>;
+  abstract findById(id: string): Promise<UserModel | null>;
+  abstract findByEmail(email: string): Promise<UserModel | null>;
+  abstract listUsers(): Promise<UserModel[] | null>;
+  abstract update(id: string, user: UserModel): Promise<void>;
 }

@@ -1,7 +1,7 @@
-import { User } from '@/domain/models/user.model';
-import { UserRepository } from '@/domain/repositories/user.repository';
-import { AuthService } from '@/domain/services/auth.service';
-import { IdGeneratorService } from '@/domain/abstractions/generate-id/id-generator.interface';
+import { UserModel } from '@domain/models/user.model';
+import { UserRepository } from '@domain/repositories/user.repository';
+import { AuthService } from '@application/abstractions/services/auth.service';
+import { IdGeneratorService } from '@application/abstractions/generate-id/id-generator.interface';
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -16,9 +16,9 @@ export class AuthServiceImpl implements AuthService {
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly idGeneratorService: IdGeneratorService,
-  ) {}
+  ) { }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<UserModel | null> {
     const user = await this.userRepository.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
@@ -41,11 +41,10 @@ export class AuthServiceImpl implements AuthService {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const id = this.idGeneratorService.generateId();
-      const user = User.register(id, name, email, hashedPassword);
-
-      await this.userRepository.create(user);
+      const userModel = UserModel.register(id, name, email, hashedPassword);
+      await this.userRepository.create(userModel);
       return {
-        accessToken: this.jwtService.sign({ email: user.email, sub: user.id }),
+        accessToken: this.jwtService.sign({ email: userModel.email, sub: userModel.id }),
       };
     } catch (error) {
       return null;

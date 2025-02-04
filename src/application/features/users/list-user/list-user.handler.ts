@@ -1,9 +1,9 @@
 import { QueryHandler as NestQueryHandler } from '@nestjs/cqrs';
-import { UserService } from '@/domain/services/user.service';
+import { UserService } from '@application/abstractions/services/user.service';
 import { ListUsersQuery } from './list-user.query';
-import { UserDto } from '@/application/dtos/users/user.dto';
-import { QueryHandler } from '@/domain/abstractions/messaging/query';
-import { Result } from '@/domain/abstractions/result';
+import { UserDto } from '@application/dtos/users/user.dto';
+import { QueryHandler } from '@domain/abstractions/messaging/query';
+import { Result } from '@domain/abstractions/result';
 
 @NestQueryHandler(ListUsersQuery)
 export class ListUsersHandler implements QueryHandler<ListUsersQuery, UserDto[]> {

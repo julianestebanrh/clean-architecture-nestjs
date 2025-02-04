@@ -201,3 +201,6 @@ El proyecto utiliza un servicio centralizado para generar IDs únicos. Actualmen
 
 
 <!-- listo teniendo en cuenta  toda mi arquitectura que hemos creado si quiero usar el patron Result para manejar mis respuestas y errores como lo puedo hacer -->
+
+
+<!-- pnpm test test/architecture.spec.ts -->

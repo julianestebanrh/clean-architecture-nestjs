@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
-import { ICorrelationStore } from '@/domain/abstractions/correlation/correlation-store.interface';
+import { ICorrelationStore } from '@application/abstractions/correlation/correlation-store.interface';
 
 @Injectable()
 export class AsyncLocalCorrelationStore implements ICorrelationStore {

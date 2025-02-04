@@ -1,12 +1,10 @@
-import { AggregateRoot } from '@/domain/abstractions/domain-event/aggregate-root';
-import { UserCreatedDomainEvent } from '@/domain/models/domain-events/user/user-created-domain.event';
-import { UserRegisteredDomainEvent } from '@/domain/models/domain-events/user/user-registered.domain.event';
-import { User } from '@/domain/models/user.model';
-import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { DomainEvent } from '@domain/abstractions/domain-event/domain-event.base';
+import { EntityBase } from '@domain/abstractions/domain-event/entity-base';
+import { UserModel } from '@domain/models/user.model';
+import { Entity, Column, PrimaryColumn  } from 'typeorm';
 
 @Entity('users')
-export class UserEntity extends AggregateRoot {
+export class UserEntity extends EntityBase {
   @PrimaryColumn('uuid')
   id: string;
 
@@ -28,34 +26,35 @@ export class UserEntity extends AggregateRoot {
     this.password = password;
   }
 
-   // Método para convertir de Entidad a Modelo de dominio
-   toDomain(): User {
-    return new User(this.id, this.name, this.email, this.password);
-  }
+  //  // Método para convertir de Entidad a Modelo de dominio
+  //  toDomain(): UserModel {
+  //     return UserModel.create(this.id, this.name, this.email, this.password);
+  //   }
 
-  // Método para convertir de Modelo de dominio a Entidad
-  static fromDomain(user: User): UserEntity {
-    const entity = new UserEntity(user.id, user.name, user.email, user.password);
+
+  // // Método para convertir de Modelo de dominio a Entidad
+  // static fromDomain(model: UserModel): UserEntity {
+  //   const entity = new UserEntity(model.id, model.name, model.email, model.password);
+  //   return entity;
+  // }
+
+  static create(model: UserModel) : UserEntity {
+    const entity = new UserEntity(model.id, model.name, model.email, model.password);
     return entity;
   }
 
-  static create(user: User): UserEntity {
-    const entity = new UserEntity(user.id, user.name, user.email, user.password);
-    entity.addDomainEvent(new UserCreatedDomainEvent(entity.id));
+  // static register(model: UserModel) : UserEntity {
+  //   const entity = new UserEntity(model.id, model.name, model.email, model.password);
+  //   return entity;
+  // }
 
-    return entity;
-  }
+  // static update(model: UserModel): UserEntity {
+  //   const entity = new UserEntity(model.id, model.name, model.email, model.password);
+  //   return entity;
+  // }
 
-  static register(id: string, name: string, email: string, password: string) : UserEntity {
-    const entity = new UserEntity(id, name, email, password);
-    entity.addDomainEvent(new UserRegisteredDomainEvent(entity.id));
-    return entity;
-  }
 
-  static update(user: User): UserEntity {
-    const entity = new UserEntity(user.id, user.name, user.email, user.password);
-    return entity;
-  }
+
 }
 
 

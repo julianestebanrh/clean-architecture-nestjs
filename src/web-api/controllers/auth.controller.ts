@@ -1,10 +1,10 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
-import { LoginDto } from '@/application/dtos/auth/login.dto';
-import { RegisterDto } from '@/application/dtos/auth/register.dto';
+import { LoginDto } from '@application/dtos/auth/login.dto';
+import { RegisterDto } from '@application/dtos/auth/register.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
-import { LoginCommand } from '@/application/features/auth/login/login.command';
-import { RegisterCommand } from '@/application/features/auth/register/register.command';
+import { LoginCommand } from '@application/features/auth/login/login.command';
+import { RegisterCommand } from '@application/features/auth/register/register.command';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -35,11 +35,10 @@ export class AuthController {
     const response = await this.commandBus.execute(
       new RegisterCommand(registerDto.name, registerDto.email, registerDto.password),
     );
-
     if (response.isFailure) {
       throw new BadRequestException(response.error);
     }
-
     return response.value;
   }
+
 }

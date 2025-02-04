@@ -2,8 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { UserRepository } from '@/domain/repositories/user.repository';
-import { User } from '@/domain/models/user.model';
+import { UserRepository } from '@domain/repositories/user.repository';
+import { UserModel } from '@domain/models/user.model';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -26,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @returns El usuario correspondiente al token.
    * @throws UnauthorizedException - Si el usuario no existe o el token es inválido.
    */
-  async validate(payload: any): Promise<User> {
+  async validate(payload: any): Promise<UserModel> {
     // El payload contiene la información que incluiste al firmar el token (por ejemplo, el userId)
     const { sub: userId } = payload;
 

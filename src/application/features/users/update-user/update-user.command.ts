@@ -1,5 +1,5 @@
-import { ICommand } from "@/domain/abstractions/messaging/command";
-import { UserDto } from "@/application/dtos/users/user.dto";
+import { ICommand } from "@domain/abstractions/messaging/command";
+import { UserDto } from "@application/dtos/users/user.dto";
 
 export class UpdateUserCommand implements ICommand<UserDto> {
     constructor(

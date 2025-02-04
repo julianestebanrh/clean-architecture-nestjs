@@ -5,15 +5,15 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron } from "@nestjs/schedule";
 import { ConfigService } from "@nestjs/config";
 import { Repository } from "typeorm";
-import { IOutboxService } from "@/domain/abstractions/outbox/outbox.interface";
-import { AggregateRoot } from "@/domain/abstractions/domain-event/aggregate-root";
-import { EventMetadata } from "@/domain/abstractions/domain-event/event-metadata.interface";
-import { ICorrelationContext } from "@/domain/abstractions/correlation/correlation-context.interface";
-import { IdGeneratorService } from "@/domain/abstractions/generate-id/id-generator.interface";
+import { OutboxService } from "@application/abstractions/outbox/outbox.interface";
+import { EntityBase } from "@domain/abstractions/domain-event/entity-base";
+import { EventMetadata } from "@domain/abstractions/domain-event/event-metadata.interface";
+import { ICorrelationContext } from "@application/abstractions/correlation/correlation-context.interface";
+import { IdGeneratorService } from "@application/abstractions/generate-id/id-generator.interface";
 
 @Injectable()
-export class OutboxService implements IOutboxService  {
-  private readonly logger = new Logger(OutboxService .name);
+export class OutboxServiceImpl implements OutboxService  {
+  private readonly logger = new Logger(OutboxServiceImpl.name);
   private isProcessing = false;
 
   constructor(
@@ -22,19 +22,21 @@ export class OutboxService implements IOutboxService  {
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
     private readonly correlationContext: ICorrelationContext,
-    private readonly idGeneratorService: IdGeneratorService,
-
+    private readonly idGeneratorService: IdGeneratorService
   ) {}
 
 
-  async saveEvents(aggregate: AggregateRoot): Promise<void> {
-    const events = aggregate.getDomainEvents();
+  async saveEvents(aggregate: EntityBase): Promise<void> {
+    const events = aggregate.domainEvents;
     this.logger.debug(`Found ${events.length} events to save in outbox`);
     
     if (events.length > 0) {
       try {
+
+        
         // Crear los OutboxMessages para cada evento
         const outboxMessages = events.map(event => {
+
           const metadata: EventMetadata = {
             eventName: event.eventType,
             aggregateId: event.getAggregateId(),
@@ -46,14 +48,12 @@ export class OutboxService implements IOutboxService  {
             }
           };
 
-          let outboxMessage = OutboxMessage.create(
+          const outboxMessage = OutboxMessage.create(
             this.idGeneratorService.generateId(),
             metadata,
             event.occurredOn,
             false
           );
-
-          this.logger.debug(`Creating outbox message: ${JSON.stringify(outboxMessage)}`);
 
           return outboxMessage;
         });
@@ -63,7 +63,9 @@ export class OutboxService implements IOutboxService  {
         this.logger.debug(`Successfully saved ${outboxMessages.length} outbox messages`);
         
         // Limpiar los eventos solo después de guardarlos exitosamente
-        aggregate.clearEvents();
+        const clearedEvents = aggregate.clearEvents();
+
+        this.logger.debug(`Successfully cleared ${clearedEvents.length} events from aggregate: ${aggregate.constructor.name}`);
       } catch (error) {
         this.logger.error(`Failed to save events to outbox: ${error.message}`, error.stack);
         throw error;
@@ -101,8 +103,8 @@ export class OutboxService implements IOutboxService  {
       for (const message of messages) {
         try {
           // Emitir el evento
-          const { eventName, payload } = message.metadata;
-          await this.eventEmitter.emitAsync(eventName, payload);
+          const { eventName, payload, context } = message.metadata;
+          await this.eventEmitter.emitAsync(eventName, {...payload, correlationId: context.correlationId});
           
           // Marcar como procesado
           message.processed = true;

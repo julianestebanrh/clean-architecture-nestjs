@@ -1,8 +1,8 @@
 # Definir la ruta de la carpeta a mapear
-$ruta = "D:\personal\repositories\astral-cinema-app"
+$ruta = "D:\personal\projects\nest\clean-architeture"
 
 # Definir carpetas y archivos a excluir
-$excludeFolders = @(".nuxt", ".output", ".vscode", ".yarn", "node_modules", ".terraform")
+$excludeFolders = @(".postgresql", "dist", ".vscode", ".yarn", "node_modules", ".seq", ".redis")
 $excludeFiles = @(".terraform.lock.hcl", ".yarnrc.yml")
 
 
