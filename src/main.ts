@@ -12,19 +12,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
 
-  // const logger = app.get(WinstonLoggerService)
-
   // Habilitar CORS (opcional)
   app.enableCors();
 
   // Pipe de validación global (opcional, ya lo configuramos en el AppModule)
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-
-  // app.useGlobalFilters(new GlobalExceptionFilter(logger));
-  // app.useGlobalInterceptors(
-  //   new LoggingInterceptor(logger),
-  //   new PerformanceInterceptor(logger)
-  // );
 
  /** Swagger */
  const options = new DocumentBuilder()

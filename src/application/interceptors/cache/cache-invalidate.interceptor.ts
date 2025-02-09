@@ -11,55 +11,99 @@ import { CacheService } from '@application/abstractions/cache/cache.interface';
 
 @Injectable()
 export class CacheInvalidatorInterceptor implements NestInterceptor {
-
-  private readonly logger = new Logger(CacheInvalidatorInterceptor.name); 
+  private readonly logger = new Logger(CacheInvalidatorInterceptor.name);
 
   constructor(private readonly cacheService: CacheService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-
-
     const request = context.switchToHttp().getRequest();
-    const { method, url, params } = request;
+    const { method, url } = request;
 
-    const cacheKey = this.getCacheKey(method, url, params);
+    // Solo procesa métodos que modifican datos
+    if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      return next.handle();
+    }
 
-    // Invalida la caché antes de ejecutar el handler
     return next.handle().pipe(
       tap(() => {
-        if (cacheKey) {
-          this.cacheService.del(cacheKey); // Invalida la clave específica
-          this.cacheService.del(`${this.getResourceFromUrl(url)}:list`); // Invalida la lista completa
-        }
+        const keysToInvalidate = this.getKeysToInvalidate(url);
+        this.invalidateCache(keysToInvalidate);
       }),
     );
   }
 
-  private getCacheKey(method: any, url: any, params: any): string {
+  private getKeysToInvalidate(url: string): string[] {
+    const urlParts = url.split('/').filter(Boolean);
+    const keysToInvalidate = new Set<string>();
 
-    // Ejemplo de claves:
-    // POST /users -> user:list (invalida la lista de usuarios)
-    // PUT /users/:id -> user:<uuid> (invalida el usuario específico)
-    // DELETE /users/:id -> user:<uuid> (invalida el usuario específico)
-    if (['POST', 'PUT', 'DELETE'].includes(method)) {
-      const resource = this.getResourceFromUrl(url); // Obtiene el recurso (users, products, etc.)
-      const id = params.id; // Obtiene el ID si existe
+    // Si es una operación en un recurso base, invalida la lista
+    if (urlParts.length === 1) {
+      keysToInvalidate.add(`${urlParts[0]}:list`);
+      return this.addPaginationPatterns(Array.from(keysToInvalidate));
+    }
 
-      if (id) {
-        return `${resource}:${id}`; // Ejemplo: user:<uuid>
+    let key = urlParts[0];
+    
+    // Construye las diferentes variantes de claves a invalidar
+    for (let i = 1; i < urlParts.length; i++) {
+      const part = urlParts[i];
+
+      if (this.isId(part)) {
+        // Invalida tanto el recurso específico como la lista
+        keysToInvalidate.add(`${key}:list`); // Lista del recurso
+        key += `:${part}`; // Recurso específico
+        keysToInvalidate.add(key);
       } else {
-        return `${resource}:list`; // Ejemplo: user:list
+        key += `:${part}`;
+        keysToInvalidate.add(key);
       }
     }
-    // Si no es una operación de escritura, no se invalida la caché
-    return null;
+
+    // Si la URL termina en un recurso (no en ID), añade la variante list
+    if (!this.isId(urlParts[urlParts.length - 1])) {
+      keysToInvalidate.add(`${key}:list`);
+    }
+
+    return this.addPaginationPatterns(Array.from(keysToInvalidate));
   }
 
-  private getResourceFromUrl(url: string): string {
-    // Extrae el recurso de la URL (por ejemplo, /users -> users)
-    const parts = url.split('/');
-    return parts[1]; // Asume que el recurso es la segunda parte de la URL
+  private addPaginationPatterns(keys: string[]): string[] {
+    const keysWithPagination = new Set<string>();
+
+    keys.forEach(key => {
+      keysWithPagination.add(key);
+      // Invalida cualquier variante con paginación
+      keysWithPagination.add(`${key}:page=*`);
+      keysWithPagination.add(`${key}:pageSize=*`);
+      keysWithPagination.add(`${key}:sort=*`);
+      keysWithPagination.add(`${key}:order=*`);
+    });
+
+    return Array.from(keysWithPagination);
+  }
+
+  private async invalidateCache(keys: string[]): Promise<void> {
+    for (const key of keys) {
+      try {
+        await this.cacheService.del(key);
+        this.logger.debug(`Invalidated cache key: ${key}`);
+      } catch (error) {
+        this.logger.error(`Error invalidating cache key ${key}: ${error.message}`);
+      }
+    }
+  }
+
+  private isId(value: string): boolean {
+    // Verifica si es un UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(value)) return true;
+
+    // Verifica si es un número
+    if (/^\d+$/.test(value)) return true;
+
+    return false;
   }
 }
+
 
 

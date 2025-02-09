@@ -11,12 +11,9 @@ import { CacheService } from '@application/abstractions/cache/cache.interface';
 
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(CacheInterceptor.name);
 
-  private readonly logger = new Logger(CacheInterceptor.name)
-
-  constructor(private readonly cacheService: CacheService) {
-
-  }
+  constructor(private readonly cacheService: CacheService) {}
 
   async intercept(
     context: ExecutionContext,
@@ -25,49 +22,97 @@ export class CacheInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const cacheKey = this.getCacheKey(request);
 
-    // Intenta obtener la respuesta desde la caché
-    const cachedResponse = await this.cacheService.get(cacheKey);
-    if (cachedResponse) {
-      this.logger.log(`Returning cached response for ${cacheKey}`);
-      return of(cachedResponse); // Devuelve la respuesta cacheada
+    if (!cacheKey) {
+      return next.handle();
     }
 
-    // Si no está en caché, ejecuta el handler y almacena la respuesta en caché
+    const cachedResponse = await this.cacheService.get(cacheKey);
+    if (cachedResponse) {
+      this.logger.log(`Cache hit: ${cacheKey}`);
+      return of(cachedResponse);
+    }
+
+    this.logger.log(`Cache miss: ${cacheKey}`);
     return next.handle().pipe(
       tap((response) => {
-        this.logger.log(`Storing response in cache for ${cacheKey}`);
+        this.logger.log(`Caching response for: ${cacheKey}`);
         this.cacheService.set(cacheKey, response);
       }),
     );
   }
 
   private getCacheKey(request: any): string {
-    const { method, url, params, query } = request;
+    const { method, url, query } = request;
 
-    // Ejemplo de claves:
-    // GET /users -> user:list
-    // GET /users/:id -> user:<uuid>
-    // GET /products -> product:list
-    // GET /products/:id -> product:<uuid>
+    if (method !== 'GET') {
+      return null;
+    }
 
-    if (method === 'GET') {
-      const resource = this.getResourceFromUrl(url); // Obtiene el recurso (users, products, etc.)
-      const id = params.id; // Obtiene el ID si existe
+    // Separa la URL base de los query params
+    const [baseUrl] = url.split('?');
+    const urlParts = baseUrl.split('/').filter(Boolean);
 
-      if (id) {
-        return `${resource}:${id}`; // Ejemplo: user:<uuid>
+    // Construye el key basado en el patrón de la URL
+    let key = this.buildResourceKey(urlParts);
+    
+    // Añade los parámetros de paginación y ordenamiento si existen
+    const paginationKey = this.buildPaginationKey(query);
+    if (paginationKey) {
+      key += paginationKey;
+    }
+
+    this.logger.debug(`Generated cache key: ${key} for URL: ${url}`);
+    return key;
+  }
+
+  private buildResourceKey(urlParts: string[]): string {
+    // Si es una lista (solo el recurso base)
+    if (urlParts.length === 1) {
+      return `${urlParts[0]}:list`;
+    }
+
+    let key = urlParts[0]; // Primer segmento sin prefijo
+
+    for (let i = 1; i < urlParts.length; i++) {
+      const part = urlParts[i];
+      
+      if (this.isId(part)) {
+        // Si es un ID, lo añadimos directamente
+        key += `:${part}`;
       } else {
-        return `${resource}:list`; // Ejemplo: user:list
+        // Para otros segmentos, los añadimos tal cual
+        key += `:${part}`;
       }
     }
 
-    // Si no es una operación GET, no se cachea
-    return null;
+    return key;
   }
 
-  private getResourceFromUrl(url: string): string {
-    // Extrae el recurso de la URL (por ejemplo, /users -> users)
-    const parts = url.split('/');
-    return parts[1]; // Asume que el recurso es la segunda parte de la URL
+  private buildPaginationKey(query: any): string {
+    if (!query || Object.keys(query).length === 0) {
+      return '';
+    }
+
+    const validParams = ['page', 'pageSize', 'sort', 'order'];
+    const queryParts: string[] = [];
+
+    for (const param of validParams) {
+      if (query[param]) {
+        queryParts.push(`${param}=${query[param]}`);
+      }
+    }
+
+    return queryParts.length ? `:${queryParts.join(':')}` : '';
+  }
+
+  private isId(value: string): boolean {
+    // Verifica si es un UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(value)) return true;
+
+    // Verifica si es un número
+    if (/^\d+$/.test(value)) return true;
+
+    return false;
   }
 }
