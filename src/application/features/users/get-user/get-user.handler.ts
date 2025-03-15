@@ -7,12 +7,12 @@ import { Result } from '@domain/abstractions/result';
 import { UserError } from '@domain/errors/user.errors';
 
 @NestQueryHandler(GetUserQuery)
-export class GetUserHandler implements QueryHandler<GetUserQuery, UserDto | null> {
+export class GetUserHandler extends QueryHandler<GetUserQuery, UserDto | null> {
     constructor(
         private readonly userService: UserService,
-    ) { }
-    
-    async execute(query: GetUserQuery): Promise<Result<UserDto>> {
+    ) { super(); }
+
+    protected async executeCore(query: GetUserQuery): Promise<Result<UserDto>> {
         const { id } = query;
         const userModel = await this.userService.getUserById(id);
         if (!userModel) {
@@ -22,6 +22,9 @@ export class GetUserHandler implements QueryHandler<GetUserQuery, UserDto | null
         const userDto = UserDto.fromDomain(userModel);
         return Result.success(userDto);
     }
+
+    
+  
 
   
 }

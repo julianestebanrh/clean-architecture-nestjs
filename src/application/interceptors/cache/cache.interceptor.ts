@@ -8,6 +8,7 @@ import {
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CacheService } from '@application/abstractions/cache/cache.interface';
+import { OrderDirection } from '@domain/abstractions/pagination/page-options';
 
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
@@ -71,16 +72,14 @@ export class CacheInterceptor implements NestInterceptor {
       return `${urlParts[0]}:list`;
     }
 
-    let key = urlParts[0]; // Primer segmento sin prefijo
+    let key = urlParts[0];
 
     for (let i = 1; i < urlParts.length; i++) {
       const part = urlParts[i];
       
       if (this.isId(part)) {
-        // Si es un ID, lo añadimos directamente
         key += `:${part}`;
       } else {
-        // Para otros segmentos, los añadimos tal cual
         key += `:${part}`;
       }
     }
@@ -93,26 +92,28 @@ export class CacheInterceptor implements NestInterceptor {
       return '';
     }
 
-    const validParams = ['page', 'pageSize', 'sort', 'order'];
-    const queryParts: string[] = [];
+    const paginationParts: string[] = [];
 
-    for (const param of validParams) {
-      if (query[param]) {
-        queryParts.push(`${param}=${query[param]}`);
-      }
+    // Manejo de paginación básica
+    if (query.page) {
+      paginationParts.push(`page=${query.page}`);
+    }
+    if (query.pageSize) {
+      paginationParts.push(`pageSize=${query.pageSize}`);
     }
 
-    return queryParts.length ? `:${queryParts.join(':')}` : '';
+    // Manejo de ordenamiento
+    if (query.orderBy && query.orderDirection) {
+      paginationParts.push(`order=${query.orderBy}:${query.orderDirection}`);
+    }
+
+    return paginationParts.length ? `:${paginationParts.join(':')}` : '';
   }
 
   private isId(value: string): boolean {
-    // Verifica si es un UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(value)) return true;
-
-    // Verifica si es un número
     if (/^\d+$/.test(value)) return true;
-
     return false;
   }
 }

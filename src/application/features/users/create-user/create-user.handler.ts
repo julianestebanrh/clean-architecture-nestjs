@@ -5,10 +5,12 @@ import { UserService } from '@application/abstractions/services/user.service';
 import { CreateUserCommand } from './create-user.command';
 
 @NestCommandHandler(CreateUserCommand)
-export class CreateUserHandler implements CommandHandler<CreateUserCommand, void> {
-  constructor(private readonly userService: UserService) {}
+export class CreateUserHandler extends CommandHandler<CreateUserCommand, void> {
+  constructor(private readonly userService: UserService) { 
+    super();
+  }
   
-  async execute(request: CreateUserCommand): Promise<Result<void>> {
+  protected async executeCore(request: CreateUserCommand): Promise<Result<void>> {
     const { name, email, password } = request;
     await this.userService.createUser(name, email, password);
     return Result.success();

@@ -75,7 +75,6 @@ export class CacheInvalidatorInterceptor implements NestInterceptor {
       // Invalida cualquier variante con paginación
       keysWithPagination.add(`${key}:page=*`);
       keysWithPagination.add(`${key}:pageSize=*`);
-      keysWithPagination.add(`${key}:sort=*`);
       keysWithPagination.add(`${key}:order=*`);
     });
 

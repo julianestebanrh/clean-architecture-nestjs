@@ -29,6 +29,10 @@ export class RedisCacheService implements CacheService {
 
   async reset(): Promise<void> {
     await this.cacheManager.clear();
+
     this.logger.log('Cache cleared');
   }
+
+  
+
 }

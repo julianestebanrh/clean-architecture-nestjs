@@ -3,6 +3,7 @@ import { UserRepository } from '@domain/repositories/user.repository';
 import { IdGeneratorService } from '@application/abstractions/generate-id/id-generator.interface';
 import { UserService } from '@application/abstractions/services/user.service';
 import { Injectable, Logger } from '@nestjs/common';
+import { PageOptions } from '@domain/abstractions/pagination/page-options';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -13,6 +14,7 @@ export class UserServiceImpl implements UserService {
     private readonly userRepository: UserRepository,
     private readonly idGeneratorService: IdGeneratorService,
   ) { }
+  
 
   async createUser(name: string, email: string, password: string): Promise<UserModel> {
     try {
@@ -31,8 +33,8 @@ export class UserServiceImpl implements UserService {
     return user;
   }
 
-  async listUsers(): Promise<UserModel[] | null> {
-    const users = await this.userRepository.listUsers();
+  async listUsers(pageOptions: PageOptions): Promise<UserModel[] | null> {
+    const users = await this.userRepository.listUsers(pageOptions);
     return users;
   }
 
@@ -43,5 +45,9 @@ export class UserServiceImpl implements UserService {
     } catch (error) {
       return null;
     }
+  }
+
+  async countUser(): Promise<number> {
+    return await this.userRepository.count();
   }
 }

@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsUtils, Repository } from 'typeorm';
 import { UserRepository } from '@domain/repositories/user.repository';
 import { UserEntity } from '@infrastructure/persistence/entities/user.entity';
 import { UserModel } from '@domain/models/user.model';
 import { UserMapper } from '../mappers/user.mapper';
+import { PageOptions } from '@domain/abstractions/pagination/page-options';
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -15,6 +16,7 @@ export class UserRepositoryImpl implements UserRepository {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) { }
+
 
   async create(user: UserModel): Promise<void> {
     try {
@@ -42,8 +44,13 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
 
-  async listUsers(): Promise<UserModel[] | null> {
-    const userEntities = await this.userRepository.find();
+  async listUsers(pageOptions: PageOptions): Promise<UserModel[] | null> {
+
+    const userEntities = await this.userRepository.find({
+      skip: pageOptions.skip,
+      take: pageOptions.take,
+      order: pageOptions.typeormOrder
+    });
     if (!userEntities) {
       return null;
     }
@@ -65,5 +72,9 @@ export class UserRepositoryImpl implements UserRepository {
 
     this.logger.debug(`Row affected: ${result.affected}`);
 
+  }
+
+  async count(): Promise<number> {
+    return await this.userRepository.count();
   }
 }

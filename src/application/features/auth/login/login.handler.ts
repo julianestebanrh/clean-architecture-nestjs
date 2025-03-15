@@ -11,7 +11,7 @@ export class LoginHandler extends CommandHandler<LoginCommand, string> {
     super();
   }
 
-  async execute(command: LoginCommand): Promise<Result<string>> {
+  protected async executeCore(command: LoginCommand): Promise<Result<string>> {
     const { email, password } = command;
     const result = await this.authService.login(email, password);
 

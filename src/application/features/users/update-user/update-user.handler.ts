@@ -8,13 +8,13 @@ import { UserDto } from '@application/dtos/users/user.dto';
 import { UpdateUserCommand } from './update-user.command';
 
 @NestCommandHandler(UpdateUserCommand)
-export class UpdateUserHandler implements CommandHandler<UpdateUserCommand, UserDto> {
+export class UpdateUserHandler extends CommandHandler<UpdateUserCommand, UserDto> {
 
   constructor(
     private readonly userService: UserService,
-  ) { }
+  ) { super(); }
 
-  async execute(command: UpdateUserCommand): Promise<Result<UserDto>> {
+  protected async executeCore(command: UpdateUserCommand): Promise<Result<UserDto>> {
     const { id, name, email, password } = command;
     const userModel = UserModel.create(id, name, email, password);
     // Actualiza el usuario en la base de datos
